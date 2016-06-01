@@ -20,6 +20,37 @@
     return root;
   }
 
+  /**
+   * Get file from gist
+   *
+   * @param {string} path - gist path {id}|{https://xxx/{github id}/{gist id}|{https://xxx/{github id}/{gist id}/}
+   */
+  function gist(path) {
+    var id = _.findLast(path.split('/'));
+    var url = 'https://api.github.com/gists/' + id;
+    var xhr= new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.send();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4) {
+        return;
+      }
+      var status = xhr.status;
+      if (status !== 200 && status !== 304) {
+        throw new Error('Invalid http status, status:' + status);
+      }
+      var data = JSON.parse(xhr.responseText);
+      _.forEach(data.files, function(data, file) {
+        console.log('[gist] %s executing...', file);
+        try {
+          new Function('', data.content).call(root);
+        } catch(e) {
+          throw new Error('Invalid gist file');
+        }
+      });
+    };
+  }
+
   function async(bool) {
     info.async = bool !== false;
     return root;
@@ -107,13 +138,14 @@
           var name = data.name;
           var mean = data.mean * 1000;
           var diff = mean / (_.first(array).mean * 1000);
-          console.log('[' + (++index) + ']', '"' + name + '"', (mean.toPrecision(2)) + 'ms', '[' + diff.toPrecision(3) + ']');
+          console.log('[%d]\t"%s"\t%sms\t[%s]', ++index, name, mean.toPrecision(3), diff.toPrecision(5));
         })
-        .value();
+        .value({ async: info.async });
     })
     .run();
   }
 
+  root.gist = gist;
   root.clean = init;
   root.async = async;
   root.setup = setup;

@@ -1,6 +1,7 @@
 {
   "predef": [
-    "console"
+    "console",
+    "JSON"
   ],
 
   "indent": 2,

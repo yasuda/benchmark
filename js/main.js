@@ -49,6 +49,7 @@
         }
       });
     };
+    return root;
   }
 
   function async(bool) {
@@ -143,6 +144,7 @@
         .value({ async: info.async });
     })
     .run();
+    return root;
   }
 
   root.gist = gist;

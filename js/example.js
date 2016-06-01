@@ -3,7 +3,9 @@
   'use strict';
 
   console.log('実行方法はexample.jsを見てネ！');
-  console.log('example()');
+  console.log('If you are interested, please check example.js!');
+  console.log('example() // execute example code.');
+  console.log('example2() // execute example code from gist.');
 
   var root = this;
 

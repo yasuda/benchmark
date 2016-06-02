@@ -10,12 +10,15 @@
 
   function init() {
     info = {
+      run: false,
+      node: false,
       async: false,
       setup: [],
       funcs: {},
       self: null,
       data: null,
-      clone: {}
+      clone: {},
+      queue: []
     };
     return root;
   }
@@ -29,6 +32,7 @@
     var id = _.findLast(path.split('/'));
     var url = 'https://api.github.com/gists/' + id;
     var xhr= new XMLHttpRequest();
+    info.run = true;
     xhr.open('GET', url);
     xhr.send();
     xhr.onreadystatechange = function() {
@@ -37,24 +41,38 @@
       }
       var status = xhr.status;
       if (status !== 200 && status !== 304) {
-        throw new Error('Invalid http status, status:' + status);
+        throw new Error('Invalid http request, status:' + status);
       }
       var data = JSON.parse(xhr.responseText);
       _.forEach(data.files, function(data, file) {
-        console.log('[gist] %s executing...', file);
+        console.log('[gist] %s resolving...', file);
         try {
           new Function('', data.content).call(root);
         } catch(e) {
           throw new Error('Invalid gist file');
         }
+        console.log('[gist] %s resolved.', file);
       });
+      info.run = false;
+      resolve();
     };
     return root;
   }
 
-  function async(bool) {
-    info.async = bool !== false;
+  /**
+   * @private
+   */
+  function setInfo(key, bool) {
+    info[key] = bool !== false;
     return root;
+  }
+
+  function async(bool) {
+    return setInfo('async', bool);
+  }
+
+  function node(bool) {
+    return setInfo('node', bool);
   }
 
   function setup(func) {
@@ -99,7 +117,66 @@
     console.log('[test] passed.');
   }
 
+  /**
+   * @private
+   */
+  function resolve() {
+    if (info.run) {
+      return false;
+    }
+    var event = info.queue.shift();
+    if (!event) {
+      return true;
+    }
+    event();
+    return resolve();
+  }
+
+  function toJson(str) {
+    return JSON.stringify(str, function(key, value) {
+      if (typeof value === 'function') {
+        return value.toString();
+      }
+      return value;
+    });
+  }
+
+  /**
+   * @private
+   */
+  function execNode() {
+    var url = location.origin + '/benchmark';
+    var xhr= new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(toJson(_.pick(info, 'async', 'setup', 'funcs')));
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4) {
+        return;
+      }
+      var status = xhr.status;
+      if (status !== 200 && status !== 304) {
+        throw new Error('Invalid http request, status:' + status);
+      }
+      var data = JSON.parse(xhr.responseText);
+      _.forEach(data, function(data, index) {
+        let name = data.name;
+        let mean = data.mean;
+        let diff = data.diff;
+        console.log('[%d]\t"%s"\t%sms\t[%s]', ++index, name, mean.toPrecision(3), diff.toPrecision(5));
+      });
+    };
+    return root;
+  }
+
   function execute() {
+    if (!resolve()) {
+      info.queue.push(execute);
+      return root;
+    }
+    if (info.node) {
+      return execNode();
+    }
     console.log('[execute] waiting...');
     var self = {};
     var data = {};
@@ -149,6 +226,7 @@
 
   root.gist = gist;
   root.clean = init;
+  root.node = node;
   root.async = async;
   root.setup = setup;
   root.set = set;

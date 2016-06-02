@@ -1,4 +1,9 @@
 {
+  "predef": [
+    "console",
+    "JSON"
+  ],
+
   "indent": 2,
 
   "bitwise": false,
@@ -28,6 +33,7 @@
   "boss": false,
   "debug": false,
   "eqnull": true,
+  "esnext": true,
   "evil": true,
   "expr": false,
   "funcscope": false,
@@ -57,6 +63,5 @@
 
   "-W018": true,
 
-  "node": true,
-  "esversion":"6"
+  "es3":true
 }

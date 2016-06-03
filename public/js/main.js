@@ -72,6 +72,26 @@
     return root;
   }
 
+  /**
+   * @private
+   */
+  function request(method, url, params, callback) {
+    var xhr= new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(params);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState !== 4) {
+        return;
+      }
+      var status = xhr.status;
+      if (status !== 200 && status !== 304) {
+        return callback(new Error('Invalid http request, status:' + status));
+      }
+      var data = JSON.parse(xhr.responseText);
+      callback(null, data);
+    };
+  }
 
   /**
    * Get file from gist
@@ -81,19 +101,11 @@
   function gist(path) {
     var id = _.findLast(path.split('/'));
     var url = 'https://api.github.com/gists/' + id;
-    var xhr= new XMLHttpRequest();
     info.run = true;
-    xhr.open('GET', url);
-    xhr.send();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState !== 4) {
-        return;
+    request('GET', url, {}, function(err, data) {
+      if (err) {
+        throw err;
       }
-      var status = xhr.status;
-      if (status !== 200 && status !== 304) {
-        throw new Error('Invalid http request, status:' + status);
-      }
-      var data = JSON.parse(xhr.responseText);
       _.forEach(data.files, function(data, file) {
         console.log('[gist] %s resolving...', file);
         try {
@@ -105,7 +117,7 @@
       });
       info.run = false;
       resolve();
-    };
+    });
     return root;
   }
 
@@ -164,26 +176,18 @@
    */
   function execNode() {
     var url = location.origin + '/benchmark';
-    var xhr= new XMLHttpRequest();
-    xhr.open('POST', url);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(toJson(_.pick(info, 'async', 'setup', 'funcs')));
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState !== 4) {
-        return;
+    var params = toJson(_.pick(info, 'async', 'setup', 'funcs'));
+    request('POST', url, params, function(err, data) {
+      if (err) {
+        throw err;
       }
-      var status = xhr.status;
-      if (status !== 200 && status !== 304) {
-        throw new Error('Invalid http request, status:' + status);
-      }
-      var data = JSON.parse(xhr.responseText);
       _.forEach(data, function(data, index) {
-        let name = data.name;
-        let mean = data.mean;
-        let diff = data.diff;
+        var name = data.name;
+        var mean = data.mean;
+        var diff = data.diff;
         console.log('[%d]\t"%s"\t%sms\t[%s]', ++index, name, mean.toPrecision(3), diff.toPrecision(5));
       });
-    };
+    });
     return root;
   }
 

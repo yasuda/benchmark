@@ -8,6 +8,9 @@
   var info;
   init();
 
+  /**
+   * initialize information
+   */
   function init() {
     info = {
       run: false,
@@ -22,6 +25,53 @@
     };
     return root;
   }
+
+  /**
+   * @private
+   */
+  function setInfo(key, bool) {
+    info[key] = bool !== false;
+    return root;
+  }
+
+  /**
+   * Set async option
+   * @param {boolean} bool
+   */
+  function async(bool) {
+    return setInfo('async', bool);
+  }
+
+  /**
+   * Set node option
+   * @param {boolean} bool
+   */
+  function node(bool) {
+    return setInfo('node', bool);
+  }
+
+  /**
+   * Set setup function
+   */
+  function setup(func) {
+    info.setup.push(func);
+    return root;
+  }
+
+  /**
+   * Set functions
+   */
+  function set(key, func) {
+    if (_.isPlainObject(key)) {
+      _.forEach(key, function(func, key) {
+        set(key, func);
+      });
+      return root;
+    }
+    info.funcs[key] = func;
+    return root;
+  }
+
 
   /**
    * Get file from gist
@@ -56,38 +106,6 @@
       info.run = false;
       resolve();
     };
-    return root;
-  }
-
-  /**
-   * @private
-   */
-  function setInfo(key, bool) {
-    info[key] = bool !== false;
-    return root;
-  }
-
-  function async(bool) {
-    return setInfo('async', bool);
-  }
-
-  function node(bool) {
-    return setInfo('node', bool);
-  }
-
-  function setup(func) {
-    info.setup.push(func);
-    return root;
-  }
-
-  function set(key, func) {
-    if (_.isPlainObject(key)) {
-      _.forEach(key, function(func, key) {
-        set(key, func);
-      });
-      return root;
-    }
-    info.funcs[key] = func;
     return root;
   }
 

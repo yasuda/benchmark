@@ -1,13 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
     <meta charset="utf-8">
+    <title></title>
     <meta name="title" content="">
     <meta name="description" content="">
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-<p>|дﾟ) < option + command + j</p>
+
+<main id="container">
+
+  <section class="grid_h_6 animte_h bg_col_rd">
+    <h1 class="hd_1 grid_h_12 animte_h flex flex-pack_center flex-align_center">
+      <b>with code</b>
+    </h1>
+
+    <div class="grid_h_9 hide">
+      <textarea class="form-input grid_w_9 grid_h_9 block_center"></textarea>
+
+      <a class="btn bg_col_rd block_center m5_t">execute</a>
+    </div>
+  </section>
+
+  <section class="grid_h_6 animte_h bg_col_bl">
+    <h1 class="hd_1 grid_h_12 animte_h flex flex-pack_center flex-align_center">
+      <b>with gist</b>
+    </h1>
+
+    <div class="grid_h_6 hide">
+      <input type="text"
+             placeholder="input your gist URL"
+             class="form-input form-input_text grid_w_9 block_center"></input>
+
+      <a class="btn bg_col_bl block_center m5_t">execute</a>
+    </div>
+  </section>
+
+</main>
+
 </body>
 <script src="js/lodash.min.js"></script>
 <script src="js/benchmark.js"></script>

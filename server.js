@@ -20,4 +20,4 @@ if (useBenchmark) {
 
 app.listen(port);
 
-console.info('**** server start [%s] ****', port);
+console.info(`server start ${port}`);

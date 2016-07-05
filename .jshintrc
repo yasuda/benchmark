@@ -58,5 +58,5 @@
   "-W018": true,
 
   "node": true,
-  "esversion":"6"
+  "esversion": 6
 }

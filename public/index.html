@@ -1,17 +1,92 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title></title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
+
+    <title></title>
+
     <meta name="title" content="">
     <meta name="description" content="">
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-<p>|дﾟ) < option + command + j</p>
-</body>
+
+<main id="container">
+
+  <section class="rel overflow_h animte_h bg_col_rd"
+           :class="{
+             'grid_h_6': selectedMethod === method.none,
+             'grid_h_11': selectedMethod === method.code,
+             'grid_h_1': selectedMethod === method.gist
+           }"
+           @click.stop="$set('selectedMethod', method.code)">
+    <h1 class="hd_1 animte_h flex flex-pack_center flex-align_center"
+        :class="[
+          selectedMethod === method.code ? 'grid_h_3' : 'grid_h_12'
+        ]">
+      <b>with code</b>
+    </h1>
+
+    <div class="grid_h_9">
+      <textarea class="form-input grid_w_9 grid_h_9 block_center"
+                v-model="code"></textarea>
+
+      <a class="btn btn_1 bg_col_rd block_center m5_t"
+         @click.stop="executeWithCode">execute</a>
+    </div>
+
+    <a class="btn btn-close"
+       :class="{
+         'hide': selectedMethod !== method.code
+       }"
+       @click.stop="$set('selectedMethod', method.none)"></a>
+  </section>
+
+  <section class="rel overflow_h animte_h bg_col_bl"
+           :class="{
+             'grid_h_6': selectedMethod === method.none,
+             'grid_h_1': selectedMethod === method.code,
+             'grid_h_11': selectedMethod === method.gist
+           }"
+           @click.stop="$set('selectedMethod', method.gist)">
+    <h1 class="hd_1 animte_h flex flex-pack_center flex-align_center"
+        :class="[
+          selectedMethod === method.gist ? 'grid_h_3' : 'grid_h_12'
+        ]">
+      <b>with gist</b>
+    </h1>
+
+    <div class="grid_h_6">
+      <input type="text"
+             placeholder="input your gist URL or ID"
+             class="form-input form-input_text grid_w_9 block_center"
+             v-model="gistId"></input>
+
+      <a class="btn btn_1 bg_col_bl block_center m5_t"
+         @click.stop="executeWithGist">execute</a>
+    </div>
+
+    <a class="btn btn-close"
+       :class="{
+         'hide': selectedMethod !== method.gist
+       }"
+       @click.stop="$set('selectedMethod', method.none)"></a>
+  </section>
+
+</main>
+
 <script src="js/lodash.min.js"></script>
+<script src="js/vue.min.js"></script>
 <script src="js/benchmark.js"></script>
 <script src="js/dcp.js"></script>
 <script src="js/main.js"></script>
 <script src="js/example.js"></script>
+<script src="js/index.js"></script>
+</body>
+
 </html>
